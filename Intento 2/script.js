@@ -1,3 +1,70 @@
+// Toast notification system
+function showToast(message, type = 'error') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// Input validation
+function validateInputs() {
+    const functionInput = document.getElementById('function').value.trim();
+    const x0 = document.getElementById('x0').value;
+    const x1 = document.getElementById('x1').value;
+    const tolerance = document.getElementById('tolerance').value;
+    const maxIter = document.getElementById('maxIter').value;
+
+    // Validar función
+    if (!functionInput) {
+        showToast('La función es requerida');
+        return false;
+    }
+    if (!/^[x0-9+\-*/^(). ]+$/.test(functionInput)) {
+        showToast('La función contiene caracteres no válidos');
+        return false;
+    }
+
+    try {
+        // Probar si la función es válida
+        f(1);
+    } catch (error) {
+        showToast('La función no es válida. Verifica la sintaxis');
+        return false;
+    }
+
+    // Validar números
+    if (!x0 || isNaN(x0)) {
+        showToast('Valor x₀ debe ser un número');
+        return false;
+    }
+
+    if (!x1 || isNaN(x1)) {
+        showToast('Valor x₁ debe ser un número');
+        return false;
+    }
+
+    if (x0 === x1) {
+        showToast('x₀ y x₁ no pueden ser iguales');
+        return false;
+    }
+
+    if (!tolerance || isNaN(tolerance) || parseFloat(tolerance) <= 0) {
+        showToast('Tolerancia debe ser un número positivo');
+        return false;
+    }
+
+    if (!maxIter || isNaN(maxIter) || parseInt(maxIter) <= 0) {
+        showToast('Máximo de iteraciones debe ser un número positivo');
+        return false;
+    }
+
+    return true;
+}
+
 // Evento para manejar el redimensionamiento
 window.addEventListener('resize', function() {
     const canvas = document.getElementById('functionGraph');
@@ -11,41 +78,57 @@ window.addEventListener('resize', function() {
 });
 
 function f(x) {
-    const expression = document.getElementById('function').value
-        .replace(/\^/g, '**')
-        .replace(/x/g, `(${x})`);
-    return eval(expression);
+    try {
+        const expression = document.getElementById('function').value
+            .replace(/\^/g, '**')
+            .replace(/x/g, `(${x})`);
+        return eval(expression);
+    } catch (error) {
+        throw new Error('Error al evaluar la función');
+    }
 }
 
 function secantMethod(x0, x1, tolerance, maxIter) {
     let results = [];
     let x2;
     
-    for (let i = 0; i < maxIter; i++) {
-        const fx0 = f(x0);
-        const fx1 = f(x1);
+    try {
+        for (let i = 0; i < maxIter; i++) {
+            const fx0 = f(x0);
+            const fx1 = f(x1);
+            
+            if (Math.abs(fx1 - fx0) < 1e-10) {
+                showToast('División por cero detectada', 'warning');
+                break;
+            }
+            
+            x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
+            
+            results.push({
+                iteration: i,
+                x0: x0,
+                x1: x1,
+                fx0: fx0,
+                fx1: fx1,
+                x2: x2,
+                error: Math.abs(x1 - x0)
+            });
+            
+            if (Math.abs(x2 - x1) < tolerance) break;
+            
+            x0 = x1;
+            x1 = x2;
+        }
         
-        if (Math.abs(fx1 - fx0) < 1e-10) break;
+        if (results.length >= maxIter) {
+            showToast('Se alcanzó el máximo de iteraciones sin convergencia', 'warning');
+        }
         
-        x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
-        
-        results.push({
-            iteration: i,
-            x0: x0,
-            x1: x1,
-            fx0: fx0,
-            fx1: fx1,
-            x2: x2,
-            error: Math.abs(x1 - x0)
-        });
-        
-        if (Math.abs(x2 - x1) < tolerance) break;
-        
-        x0 = x1;
-        x1 = x2;
+        return results;
+    } catch (error) {
+        showToast('Error en el cálculo: ' + error.message);
+        return [];
     }
-    
-    return results;
 }
 
 function updateTable(results) {
@@ -81,20 +164,24 @@ function drawFunction(ctx, results) {
     const points = [];
     for (let i = 0; i <= 100; i++) {
         const x = minX + (i / 100) * (maxX - minX);
-        points.push({x: x, y: f(x)});
+        try {
+            points.push({x: x, y: f(x)});
+        } catch (error) {
+            continue;
+        }
     }
     const yValues = points.map(p => p.y);
     const minY = Math.min(...yValues);
     const maxY = Math.max(...yValues);
     
-    // Funciones de transformación para mapear coordenadas matemáticas a coordenadas del canvas
+    // Funciones de transformación
     const transformX = (x) => padding + (x - minX) * (width - 2 * padding) / (maxX - minX);
     const transformY = (y) => height - (padding + (y - minY) * (height - 2 * padding) / (maxY - minY));
     
     // Limpiar canvas
     ctx.clearRect(0, 0, width, height);
     
-    // Dibujar ejes
+    // Dibujar ejes y cuadrícula
     ctx.beginPath();
     ctx.strokeStyle = '#666';
     ctx.lineWidth = 1;
@@ -108,11 +195,11 @@ function drawFunction(ctx, results) {
     ctx.lineTo(padding, height - padding);
     ctx.stroke();
     
-    // Dibujar la cuadrícula
+    // Cuadrícula
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 0.5;
     
-    // Líneas verticales de la cuadrícula
+    // Líneas verticales
     for (let x = minX; x <= maxX; x++) {
         const xPos = transformX(x);
         ctx.beginPath();
@@ -120,13 +207,13 @@ function drawFunction(ctx, results) {
         ctx.lineTo(xPos, height - padding);
         ctx.stroke();
         
-        // Etiquetas del eje X
+        // Etiquetas X
         ctx.fillStyle = '#666';
         ctx.textAlign = 'center';
         ctx.fillText(x.toFixed(1), xPos, height - padding + 15);
     }
     
-    // Líneas horizontales de la cuadrícula
+    // Líneas horizontales
     for (let y = Math.floor(minY); y <= Math.ceil(maxY); y++) {
         const yPos = transformY(y);
         ctx.beginPath();
@@ -134,13 +221,13 @@ function drawFunction(ctx, results) {
         ctx.lineTo(width - padding, yPos);
         ctx.stroke();
         
-        // Etiquetas del eje Y
+        // Etiquetas Y
         ctx.fillStyle = '#666';
         ctx.textAlign = 'right';
         ctx.fillText(y.toFixed(1), padding - 5, yPos + 4);
     }
     
-    // Dibujar la función
+    // Dibujar función
     ctx.beginPath();
     ctx.strokeStyle = '#00ff88';
     ctx.lineWidth = 2;
@@ -161,37 +248,59 @@ function drawFunction(ctx, results) {
 }
 
 function updateResult(results) {
-    const lastResult = results[results.length - 1];
-    document.getElementById('finalResult').textContent = lastResult.x2.toFixed(9);
-    document.getElementById('finalError').textContent = lastResult.error.toFixed(9);
-    document.getElementById('totalIterations').textContent = results.length;
-}
-
-function calculate() {
-    const x0 = parseFloat(document.getElementById('x0').value);
-    const x1 = parseFloat(document.getElementById('x1').value);
-    const tolerance = parseFloat(document.getElementById('tolerance').value);
-    const maxIter = parseInt(document.getElementById('maxIter').value);
-    
-    try {
-        const results = secantMethod(x0, x1, tolerance, maxIter);
-        window.lastResults = results; // Guardar resultados para redibujado
-        updateResult(results);
-        updateTable(results);
-        
-        const canvas = document.getElementById('functionGraph');
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-        const ctx = canvas.getContext('2d');
-        drawFunction(ctx, results);
-    } catch (error) {
-        alert('Error al calcular: ' + error.message);
+    if (results.length > 0) {
+        const lastResult = results[results.length - 1];
+        document.getElementById('finalResult').textContent = lastResult.x2.toFixed(9);
+        document.getElementById('finalError').textContent = lastResult.error.toFixed(9);
+        document.getElementById('totalIterations').textContent = results.length;
+    } else {
+        document.getElementById('finalResult').textContent = '-';
+        document.getElementById('finalError').textContent = '-';
+        document.getElementById('totalIterations').textContent = '0';
     }
 }
 
-// Evento para manejar el Enter en el input de la función
+function calculate() {
+    if (!validateInputs()) return;
+    
+    try {
+        const x0 = parseFloat(document.getElementById('x0').value);
+        const x1 = parseFloat(document.getElementById('x1').value);
+        const tolerance = parseFloat(document.getElementById('tolerance').value);
+        const maxIter = parseInt(document.getElementById('maxIter').value);
+        
+        const results = secantMethod(x0, x1, tolerance, maxIter);
+        
+        if (results.length > 0) {
+            window.lastResults = results;
+            updateResult(results);
+            updateTable(results);
+            
+            const canvas = document.getElementById('functionGraph');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            const ctx = canvas.getContext('2d');
+            drawFunction(ctx, results);
+            
+            showToast('Cálculo completado exitosamente', 'success');
+        }
+    } catch (error) {
+        showToast('Error en el cálculo: ' + error.message);
+    }
+}
+
+// Event Listeners
 document.getElementById('function').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         calculate();
+    }
+});
+
+// Inicialización
+window.addEventListener('load', function() {
+    const canvas = document.getElementById('functionGraph');
+    if (canvas) {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
     }
 });

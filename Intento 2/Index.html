@@ -8,7 +8,7 @@
 </head>
 <body>
     <nav class="nav-menu">
-        <a href="Index.html" class="nav-link">Calculadora</a>
+        <a href="index.html" class="nav-link active">Calculadora</a>
         <a href="guia.html" class="nav-link">Guía de Usuario</a>
         <a href="about.html" class="nav-link">Acerca de</a>
     </nav>
@@ -21,31 +21,33 @@
 
         <div class="calculator-container">
             <div class="input-section">
-                <div class="input-field">
-                    <label for="function">Función:</label>
-                    <input type="text" id="function" placeholder="Ejemplo: x^2 - 4" value="x^2 - 4">
-                </div>
-                <div class="input-group">
+                <form id="calculatorForm" onsubmit="event.preventDefault(); calculate();">
                     <div class="input-field">
-                        <label for="x0">Valor x₀:</label>
-                        <input type="number" id="x0" value="1">
+                        <label for="function">Función:</label>
+                        <input type="text" id="function" placeholder="Ejemplo: x^2 - 4" value="x^2 - 4" required>
                     </div>
-                    <div class="input-field">
-                        <label for="x1">Valor x₁:</label>
-                        <input type="number" id="x1" value="2">
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label for="x0">Valor x₀:</label>
+                            <input type="number" id="x0" value="1" step="any" required>
+                        </div>
+                        <div class="input-field">
+                            <label for="x1">Valor x₁:</label>
+                            <input type="number" id="x1" value="2" step="any" required>
+                        </div>
                     </div>
-                </div>
-                <div class="input-group">
-                    <div class="input-field">
-                        <label for="tolerance">Tolerancia:</label>
-                        <input type="number" id="tolerance" value="0.000001">
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label for="tolerance">Tolerancia:</label>
+                            <input type="number" id="tolerance" value="0.000001" step="0.0001" min="0" required>
+                        </div>
+                        <div class="input-field">
+                            <label for="maxIter">Máx. iteraciones:</label>
+                            <input type="number" id="maxIter" value="20" min="1" step="1" required>
+                        </div>
                     </div>
-                    <div class="input-field">
-                        <label for="maxIter">Máx. iteraciones:</label>
-                        <input type="number" id="maxIter" value="20">
-                    </div>
-                </div>
-                <button onclick="calculate()" class="calculate-btn">Calcular</button>
+                    <button type="submit" class="calculate-btn">Calcular</button>
+                </form>
             </div>
 
             <div class="result-box">
@@ -94,6 +96,7 @@
             </div>
         </div>
     </div>
+    <div id="toast" class="toast"></div>
     <script src="script.js"></script>
 </body>
 </html>
