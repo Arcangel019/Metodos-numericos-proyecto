@@ -1,0 +1,1 @@
+Esta version de la calculadora esta implementada en python con interfaz greafica y con la resolucion del ejercicio, sin embargo es super rudimental

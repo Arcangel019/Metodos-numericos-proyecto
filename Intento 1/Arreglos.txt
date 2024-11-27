@@ -1,0 +1,5 @@
+Esta version no cuenta con validacion de campos y tampoco es respondive
+pero es una buena base para empezar a trabajar
+    -Genera grafica
+    -Resuelve ejercicios
+    

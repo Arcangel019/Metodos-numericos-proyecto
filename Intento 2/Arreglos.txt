@@ -1,1 +1,6 @@
-Esta version es responsive
+Esta version es responsive, cuenta con la validacion de datos en los campos, trabajamos con 9 decimales apra mayor exactitud
+    -Genera grafica
+    -Resuelve el ejercicio
+    -Muestra el resultado en pantalla
+    -Las instrucciones estan mas detalladas
+    -El about esta mejor estructurado
