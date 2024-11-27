@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Usuario - Método de la Secante</title>
+    <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+    <div class="main-container">
+        <!-- Copiar la navegación aquí -->
+        <nav class="nav-menu">
+            <a href="Index.html" class="nav-link">Calculadora</a>
+            <a href="guia.html" class="nav-link">Guía de Usuario</a>
+            <a href="about.html" class="nav-link">Acerca de</a>
+        </nav>
+
+        <div class="header">
+            <h1>Guía de Usuario</h1>
+            <p>Aprende a usar la calculadora del Método de la Secante</p>
+        </div>
+
+        <div class="guide-section">
+            <h2>¿Qué es el Método de la Secante?</h2>
+            <p>El método de la secante es un algoritmo numérico que permite encontrar las raíces (ceros) de una función continua. Es una variación del método de Newton-Raphson que no requiere el cálculo de derivadas.</p>
+        </div>
+
+        <div class="guide-section">
+            <h2>Cómo Usar la Calculadora</h2>
+            <ol class="step-list">
+                <li>
+                    <strong>Ingresa la Función:</strong>
+                    <p>Escribe la función matemática usando la variable 'x'. Por ejemplo: x^2 - 4</p>
+                    <div class="example">
+                        Operadores válidos:<br>
+                        ^ para potencias x^2<br>
+                        * para multiplicación<br>
+                        / para división<br>
+                        + para suma<br>
+                        - para resta
+                    </div>
+                </li>
+                <li>
+                    <strong>Define los Valores Iniciales:</strong>
+                    <p>Ingresa dos valores iniciales x₀ y x₁ que estén cerca de la raíz esperada.</p>
+                </li>
+                <li>
+                    <strong>Ajusta la Tolerancia:</strong>
+                    <p>Define la precisión deseada. Un valor común es 0.0001</p>
+                </li>
+                <li>
+                    <strong>Establece las Iteraciones Máximas:</strong>
+                    <p>Define el número máximo de iteraciones para evitar bucles infinitos.</p>
+                </li>
+                <li>
+                    <strong>Interpreta los Resultados, ya que la calculadora mostrará:</strong>
+					<p></p>                   
+                        La raíz aproximada encontrada<br>
+                        El error estimado<br>
+                        El número de iteraciones realizadas<br>
+                        Una tabla con el proceso iterativo<br>
+                        Una gráfica de la función con los puntos de iteración<br>                    
+                </li>
+            </ol>
+        </div>
+
+        <div class="guide-section">
+            <h2>Ejemplos Prácticos</h2>
+            <div class="example">
+                <p><strong>Ejemplo 1:</strong> Encontrar la raíz de x² - 4</p>
+                    Función: x^2 - 4<br>
+                    x₀ = 1<br>
+                    x₁ = 2<br>
+                    Tolerancia = 0.0001<br>
+                    Resultado esperado ≈ 2<br>                
+            </div>
+        </div>
+    </div>
+</body>
+</html>
