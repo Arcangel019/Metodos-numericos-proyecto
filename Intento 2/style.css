@@ -275,6 +275,10 @@ tr:hover {
     margin-bottom: 20px;
 }
 
+.team-section a {
+	color: var(--text-secondary);
+}
+
 .section-info {
     margin-left: 20px;
 }
